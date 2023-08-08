@@ -1,6 +1,4 @@
-/* This document reprecents the conection with the client */
 
-// Imports modulos necesarios 
 const { client, xml } = require("@xmpp/client");
 const debug = require("@xmpp/debug");
 
@@ -8,25 +6,23 @@ const debug = require("@xmpp/debug");
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 
-// Variables a utilizar
-const user = "paolaContreras";
-
-// Conexion al servidor 
 const xmpp = client({
     service: "xmpp://alumchat.xyz:5222", // Puerto y protocolo
     domain: "alumchat.xyz", // Dominio del servidor XMPP
-    username: user, // Username
+    username: "paolaContreras", // Username
     password: "Uvg12345", // Contraseña 
 
     // permite que nodejs acepte o no conexiones
     tls: {
         rejectUnauthorized: true,
     }
-
 });
-    console.log('Connected to XMPP server');
+const receiverJID = 'paolaContreras@alumchat.xyz'; // Adjust this
+xmpp.on('stanza', (stanza) => {
+    console.log(stanza)
+    if (stanza.is('iq')){
+        console.log(`Message received from `);
+      }
+    });
 
-module.exports = {
-    xmpp,
-    user
-  };
+xmpp.start().catch(console.error);
