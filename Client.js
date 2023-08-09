@@ -104,21 +104,14 @@ server.xmpp.on('online', archivoAImportar.message_file(user1,person1,fileUrl));
 server.xmpp.start().catch(console.error);
 
 // -------------------------------------------------------------------------------------------------------
-// Registrar una nueva cuenta en el servidor
-// 2) Iniciar sesión con una cuenta
-// 3) Cerrar sesión con una cuenta
-// 4) Eliminar la cuenta del servidor
 
+// DELETE FROM ROOSTER AL ELIMINAR CUENTA
 
-// Comunicación (80% del funcionamiento, 10% cada funcionalidad)
-// 1) Mostrar todos los contactos y su estado
-// 2) Agregar un usuario a los contactos                              DONE
-// 2.1) aceptar contacto                                              DONE
+// 1) Mostrar todos los contactos y su estado                                       
 // 3) Mostrar detalles de contacto de un usuario
 // 4) Comunicación 1 a 1 con cualquier usuario/contacto enviar        DONE
 // 4.1)Recibir mensajes
 // 5) Participar en conversaciones grupales
-// 6) Definir mensaje de presencia                                    DONE
 // 7) Enviar/recibir notificaciones
 // 8) Enviar archivos
 // 8.1) recibir archivos
