@@ -109,10 +109,8 @@ server.xmpp.start().catch(console.error);
 
 // 1) Mostrar todos los contactos y su estado                                       
 // 3) Mostrar detalles de contacto de un usuario
-// 4) Comunicación 1 a 1 con cualquier usuario/contacto enviar        DONE
-// 4.1)Recibir mensajes
 // 5) Participar en conversaciones grupales
-// 7) Enviar/recibir notificaciones
+
 // 8) Enviar archivos
 // 8.1) recibir archivos
 

@@ -1,8 +1,5 @@
 const { client, xml } = require("@xmpp/client");
-
-
-const Server = require('./Conection');
-  
+const { v4: uuidv4 } = require('uuid');
   
 async function register(user, password){
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -46,7 +43,6 @@ async function register(user, password){
     return true; 
 }
 
-
 function delete_account(user,password){
     const stanza = xml(
         'iq', 
@@ -60,41 +56,6 @@ function delete_account(user,password){
     return stanza;
 }
 
-
-function message_one_one(user, person, text) {
-    return () => {
-  
-        const messageXml = xml(
-            "message",
-            { from: `${user}@alumchat.xyz`, to: `${person}@alumchat.xyz`, type: "chat" },
-            xml("body", {}, text)
-        );
-  
-        Server.xmpp.send(messageXml);
-        console.log(messageXml);
-        return messageXml;
-    };
-  }
-  
-  function message_file(user, person, fileUrl) {
-    return () => {
-  
-        const messageXml = xml(
-            "message",
-            { from: `${user}@alumchat.xyz`, to: `${person}@alumchat.xyz`, type: "chat" },
-            xml("body", {}, fileUrl)
-        );
-
-  
-        Server.xmpp.send(messageXml);
-        console.log(messageXml);
-        return messageXml;
-    };
-  }
-  
-
-
-
 function subscribe(user, person) {
     console.log('Sending subscribe request .... ');
     const stanza = xml(
@@ -103,9 +64,8 @@ function subscribe(user, person) {
     );
     
     return stanza;
-  }
+}
   
-
 function acceptSubscription(user, person) {
     const request = xml(
         "presence",
@@ -124,7 +84,6 @@ function declineSubscription(user, person) {
     return(request)
 }
 
-
 function presence_message(user, show, status) {
     const messageXml = xml(
         "presence",
@@ -134,16 +93,45 @@ function presence_message(user, show, status) {
     );
     console.log("Se ha actualizado presencia")
     return(messageXml)
-  }
+}
 
-  function presence(user) {
+function presence(user) {
     const messageXml = xml(
         "presence",
         { from: `${user}@alumchat.xyz`, type: "unavailable"},
     );
-    console.log("Se ha actualizado presencia")
     return(messageXml)
-  }
+}
+
+function message_one_one(user, person, text) {
+    const messageId = uuidv4();
+    const messageXml = xml(
+        "message",
+        { from: `${user}@alumchat.xyz`, to: `${person}@alumchat.xyz`, type: "chat", id: messageId},
+        xml("body", {}, text)
+    );
+    return messageXml;
+}
+
+function mark_read_one_one(user, person,ID){
+    const messageXml = xml(
+        "message",
+        { from: `${user}@alumchat.xyz`, to: `${person}@alumchat.xyz`, type: "chat", id:"read" },
+        xml("displayed", {xmlns: "urn:xmpp:chat-markers:0",id: ID})
+    );
+    console.log(">> Mensaje leido");
+    return messageXml;  
+}
+
+function received_one_one(user, person,ID){
+    const messageXml = xml(
+        "message",
+        { from: `${user}@alumchat.xyz`, to: `${person}@alumchat.xyz`, type: "chat", id:"received" },
+        xml("received", { xmlns: 'urn:xmpp:chat-markers:0',id: ID})
+    );
+    return messageXml;  
+}
+
 
 module.exports = {
     message_one_one,
@@ -153,5 +141,6 @@ module.exports = {
     presence,
     register,
     delete_account,
-    message_file
+    mark_read_one_one,
+    received_one_one
 };
