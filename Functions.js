@@ -52,9 +52,22 @@ function delete_account(user,password){
         xml("password", {}, password),
         xml("remove"),
         ));
-    console.log(stanza.toString())
     return stanza;
 }
+
+function rooster(user){
+    const stanza = xml(
+        "iq",
+        { to: `${user}@alumchat.xyz`, type: "get" },
+        xml("query", { xmlns: "jabber:iq:roster" })
+    )
+    return stanza;
+}
+
+
+
+
+
 
 function subscribe(user, person) {
     console.log('Sending subscribe request .... ');
@@ -134,6 +147,7 @@ function received_one_one(user, person,ID){
 
 
 module.exports = {
+    rooster,
     message_one_one,
     subscribe,
     presence_message,
