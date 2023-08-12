@@ -105,19 +105,27 @@ server.xmpp.start().catch(console.error);
 
 // -------------------------------------------------------------------------------------------------------
 
-// DELETE FROM ROOSTER AL ELIMINAR CUENTA
+console.log("1. Ver grupos");
+console.log("2. Crear grupo");
+console.log("3. Ver mensajes");
+console.log("4. Invitar amigo a un grupo");
+console.log("5. Enviar mensaje a un grupo");
+console.log("6. Regresar");                   
 
-// 1) Mostrar todos los contactos y su estado                                       
+
 // 3) Mostrar detalles de contacto de un usuario
-// 5) Participar en conversaciones grupales
-
+// 2.1) Almacenar mensajes
+// 5.1) Crear grupo 
+// 5.2) Enviar y recibir mensajes grupales 
+// 5.3) Enviar y aceptar solicitud 
+// 5.4) Almacenar mensajes
+// 7) Terminar notificiaciones 
 // 8) Enviar archivos
 // 8.1) recibir archivos
 
 
 // Grajim
-// - Paola_Contreras label 
-// - account: paolaContreras@alumchat.xyz
+// - Paola_Contreras 
 // - Uvg12345
 
 // -gaby20213

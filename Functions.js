@@ -64,11 +64,6 @@ function rooster(user){
     return stanza;
 }
 
-
-
-
-
-
 function subscribe(user, person) {
     console.log('Sending subscribe request .... ');
     const stanza = xml(
@@ -93,7 +88,6 @@ function declineSubscription(user, person) {
         "presence",
         { from: `${user}@alumchat.xyz`, to: `${person}@alumchat.xyz`, type: "unsubscribe" },
     );
-    console.log(`Accepted subscription from ${person} `);
     return(request)
 }
 
@@ -112,6 +106,14 @@ function presence(user) {
     const messageXml = xml(
         "presence",
         { from: `${user}@alumchat.xyz`, type: "unavailable"},
+    );
+    return(messageXml)
+}
+
+function my_presence(user) {
+    const messageXml = xml(
+        "presence",
+        { from: `${user}@alumchat.xyz`, type: "available"},
     );
     return(messageXml)
 }
@@ -145,16 +147,118 @@ function received_one_one(user, person,ID){
     return messageXml;  
 }
 
+function create_group(room, user){ 
+    const Stanza = xml(
+      "presence",
+      { to: `${room}@conference.alumchat.xyz/${user}`, from: `${room}@conference.alumchat.xyz/${user}`}
+    );
+  
+    const xElement = xml(
+      "x",
+      {xmlns: "http://jabber.org/protocol/muc#user"}
+    );
+  
+    const itemElement = xml(
+      "item",
+      {jid: `${user}`, affiliation: "owner", role: "moderator"}
+    );
+  
+    xElement.append(itemElement);
+    Stanza.append(xElement);
+    
+    console.log(Stanza.toString())
+    return Stanza;
+}
+
+function invite_group( room, person){
+    const stanza = xml(
+        "iq",
+        {xmlns:"jabber:client", to: `${room}@conference.alumchat.xyz`, type: "set" },
+        xml("query", { xmlns: "http://jabber.org/protocol/muc#admin" },
+        xml("item", { jid: `${person}@alumchat.xyz`, affiliation: "member" })
+    ));
+    console.log(stanza.toString())
+    return stanza;  
+}
+
+
+function not_invateGroup(room,person){
+    const messageXml = xml(
+        "message",
+        {xmlns:"jabber:client", to: `${person}@alumchat.xyz`},
+        xml("x", { xmlns:"jabber:x:conference" , jid: `${room}@conference.alumchat.xyz` })
+    );
+    return messageXml;
+}
+
+function acceptInvate(user,room){
+    const stanza = xml(
+        "presence",
+        { xmlns:"jabber:client", to: `${room}@conference.alumchat.xyz/${user}`},
+        xml("x", {xmlns:"http://jabber.org/protocol/muc"})
+
+    );
+    return(stanza)
+}
+
+function joinRoom(room,user){
+    const stanza = xml(
+        "iq",
+        {xmlns:"jabber:client", type:"set"},
+        xml("pubsub",{ xmlns:"http://jabber.org/protocol/pubsub"},
+        xml("publish",{ node:"storage:bookmarks"},
+        xml("item",{ id:"current"},
+        xml("storage ",{ xmlns:"storage:bookmarks"},
+        xml("conference ",{ jid:`${room}@conference.alumchat.xyz`,  autojoin:"true"},
+        xml("nick ",{}, user)
+        )))),
+
+        xml("publish-options",{},
+        xml("x",{ xmlns:"jabber:x:data", type:"submit"},
+        xml("field",{ var:"FORM_TYPE",type:"hidden"},
+        xml("value ",{}, "http://jabber.org/protocol/pubsub#publish-option")),
+        
+        xml("field",{ var:"pubsub#persist_items"},
+        xml("value ",{}, true)),
+
+        xml("field",{ var:"pubsub#access_model"},
+        xml("value ",{}, "whitelist")),
+
+        )))
+    )
+
+    return(stanza)
+}
+
+function message_group( user, room, text) {
+    const messageId = uuidv4();
+    const messageXml = xml(
+        "message",
+        { to:`${room}@conference.alumchat.xyz`, type: "groupchat", xmlns:"jabber:client", id: messageId},
+        xml("nick",{},user),
+        xml("body", {}, text)
+    );
+    console.log(messageXml.toString())
+    return messageXml;
+}
 
 module.exports = {
     rooster,
-    message_one_one,
-    subscribe,
-    presence_message,
-    acceptSubscription,
     presence,
     register,
+    joinRoom,
+    subscribe,
+    my_presence,
+    acceptInvate,
+    invite_group,
+    create_group,
+    message_group,
     delete_account,
+    not_invateGroup,
+    message_one_one,
+    presence_message,
+    received_one_one,
     mark_read_one_one,
-    received_one_one
+    acceptSubscription,
+    declineSubscription
 };

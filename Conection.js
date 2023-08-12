@@ -1,32 +1,30 @@
-/* This document reprecents the conection with the client */
+// Este documento representa la conexión con el cliente
+// Imports de los módulos necesarios
+const { client } = require("@xmpp/client");
 
-// Imports modulos necesarios 
-const { client, xml } = require("@xmpp/client");
-const debug = require("@xmpp/debug");
+// Desactivación de certificados SSL/TLS
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-// Desactivacion de certificados SSL/TLS 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+// Función para crear una conexión XMPP
+function createXMPPConnection(username, password) {
+  const xmpp = client({
+    service: "xmpp://alumchat.xyz:5222",
+    domain: "alumchat.xyz",
+    username: username,
+    password: password,
 
-
-// Variables a utilizar
-const user = "paolaContreras";
-
-// Conexion al servidor 
-const xmpp = client({
-    service: "xmpp://alumchat.xyz:5222", // Puerto y protocolo
-    domain: "alumchat.xyz", // Dominio del servidor XMPP
-    username: user, // Username
-    password: "Uvg12345", // Contraseña 
-
-    // permite que nodejs acepte o no conexiones
     tls: {
-        rejectUnauthorized: true,
+      rejectUnauthorized: true,
     }
-
-});
-    console.log('Connected to XMPP server');
-
-module.exports = {
-    xmpp,
-    user
+  });
+  console.log(`\n Connecting to XMPP server as ${username}`);
+  return {
+    xmpp
+    
   };
+}
+
+// Exportar la función de creación de conexión
+module.exports = {
+  createXMPPConnection
+};
