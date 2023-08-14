@@ -3,7 +3,6 @@
 // Imports modulos necesarios 
 const { client, xml } = require("@xmpp/client");
 const debug = require("@xmpp/debug");
-const readline = require('readline');
 
 // Desactivacion de certificados SSL/TLS 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
