@@ -7,10 +7,12 @@ const Func = require('./Functions');
 let xmppInstance;
 let using_user;
 let showing;
-let list = [];
 let roomN;
+
 let GM = [];
 let PM = [];
+let list = [];
+let rosterInfo = [];
 
 // Input 
 const rl = readline.createInterface({
@@ -175,7 +177,7 @@ rl.question("Ingresa tu usuario: ", (username) => {
           const from = stanza.attrs.from;
           const me = `${username}@alumchat.xyz`
           if (from !== username){
-            console.log(`\n NOTIFICATION >>> ${from} eliminated you form rooster`);
+            console.log(`\n NOTIFICATION >>> ${from} eliminated you form roster`);
           }
       } else if (stanza.is('presence') && stanza.attrs.type === 'unavailable'){
           const from = stanza.attrs.from;
@@ -200,10 +202,27 @@ rl.question("Ingresa tu usuario: ", (username) => {
           
           list = items.map(item => ({
             name: item.attrs.jid,
-            subscription: item.attrs.subscription
+            subscription: item.attrs.subscription,
         }));
+
+        rosterInfo = items.map(item => {
+          const jid = item.attrs.jid;
+          const label = item.attrs.name || '';
+          const subscription = item.attrs.subscription;
+          const presence = item.getChild('presence', 'jabber:client');
+          const presenceType = presence ? presence.attrs.type : 'unavailable';
+          
+          return {
+            jid,
+            label,
+            subscription,
+            presence: presenceType
+          };
+        });
+
           console.log(list);
           Func_menu();
+
     }else if (stanza.is('message')  && stanza.getChild('x')  && stanza.getChild('x').attrs.xmlns === 'jabber:x:conference'){
       const xElement = stanza.getChild('x');
       const jid = xElement.attrs.jid;
@@ -235,10 +254,8 @@ rl.question("Ingresa tu usuario: ", (username) => {
           body: body
         };
         GM.push(messageObject);
-      }
-      
+      } 
     }
-      
     });
 
       xmpp.on('online', async (address) => {
@@ -336,7 +353,6 @@ function new_group(){
 });
 }
 
-
 function group_invite(){
   rl.question("Ingresa nombre del grupo: ", (room) => {
     rl.question("Ingresa nombre de la persona: ", (person) => {
@@ -382,12 +398,47 @@ function showPM(){
   }
   private_menu();
 }
+
+function getContact(person, rosterInfo) {
+  const contact = rosterInfo.find(p => p.jid === person);
+  
+  if (contact) {
+    console.log("------------------------------------");
+    console.log("INFORMACION DEL CONTACTO");
+    console.log(`Label: ${contact.label}`);
+    console.log(`Subscription: ${contact.subscription}`);
+    console.log(`Presence: ${contact.presence}`);
+    console.log(`Jid: ${contact.jid}`);
+    console.log("------------------------------------");
+  } else {
+    console.log("Contact not found.");
+  }
+}
+
+function askContact(rosterInfo){
+  rl.question("Ingresa nombre del contacto: ", (person) => {
+    const personToSearch = `${person}@alumchat.xyz`;
+    getContact(personToSearch, rosterInfo)
+    Func_menu();
+  });
+}
+
+function fileMe(){
+  rl.question("Ingresa usuario a contactar: ", async (person) => {
+    rl.question("Ingresa nombre del archivo : ", async (file) => {
+      const filePath = `./${file}`;
+      st = Func.file_message(person,filePath);
+      xmppInstance.send(st);
+      Func_menu();
+      });
+  });
+}
+
 function Choice_FuncMenu(choice,) {
     switch (choice) {
         case '1':
             console.log("\nSeleccionaste Mostrar Contactos");
             rooster_list();
-
             break;
         case '2':
             console.log("\nSeleccionaste Agregar Amigos");
@@ -395,6 +446,7 @@ function Choice_FuncMenu(choice,) {
             break;
         case '3':
             console.log("\nSeleccionaste Ver detalles de un contacto");
+            askContact(rosterInfo);
             break;
         case '4':
             console.log("\nSeleccionaste Chat Privado");
@@ -410,6 +462,7 @@ function Choice_FuncMenu(choice,) {
             break;
         case '7':
             console.log("\nSeleccionaste Enviar Archivos");
+            fileMe()
             break;
         case '8':
             update_presence_type();
@@ -506,7 +559,6 @@ function Choice_group(choice){
       break;
     }
 }
-
 
 function mainMenu() {
     Main_menu();

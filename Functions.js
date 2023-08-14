@@ -1,5 +1,6 @@
-const { client, xml } = require("@xmpp/client");
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const { client, xml } = require("@xmpp/client");
   
 async function register(user, password){
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -181,7 +182,6 @@ function invite_group( room, person){
     return stanza;  
 }
 
-
 function not_invateGroup(room,person){
     const messageXml = xml(
         "message",
@@ -238,8 +238,20 @@ function message_group( user, room, text) {
         xml("nick",{},user),
         xml("body", {}, text)
     );
-    console.log(messageXml.toString())
     return messageXml;
+}
+
+function file_message(person, filePath){
+    const file = fs.readFileSync(filePath, { encoding: 'base64' })
+    const text = filePath.replace('./', '')
+    const stanza = xml(
+        'message',
+        { to: `${person}@alumchat.xyz`, type: 'chat' },
+        xml('body', {}, text),
+        xml('attachment', { xmlns: 'urn:xmpp:attachment', id: 'attachment1', encoding: 'base64'}, file)
+    )
+    console.log(`> Documento ${filePath} enviado a: ${person}`)
+    return stanza
 }
 
 module.exports = {
@@ -252,6 +264,7 @@ module.exports = {
     acceptInvate,
     invite_group,
     create_group,
+    file_message,
     message_group,
     delete_account,
     not_invateGroup,
