@@ -3,6 +3,7 @@ const { xml, client } = require('@xmpp/client');
 const readline = require('readline');
 const Server = require('./Conection');
 const Func = require('./Functions');
+const fs = require('fs');
 
 let xmppInstance;
 let using_user;
@@ -139,17 +140,29 @@ rl.question("Ingresa tu usuario: ", (username) => {
 
 
             if (body !== null){
-              received = Func.received_one_one(username,from,id),
-              xmpp.send(received);
-              sleep(1000);
-              console.log(`\n NOTIFICATION  >>> Message from: ${from} \n\t\t content: ${body}`);
 
-              const messageObject = {
-                person: from,
-                body: body,
-                id: id
-              };
-              PM.push(messageObject);
+              if(stanza.getChildText('attachment')){
+                const doc = stanza.getChildText('attachment');
+                const decodedDoc = Buffer.from(doc, 'base64');
+                const filepath = `Docs/${body}`
+                fs.writeFileSync(filepath, decodedDoc);
+                console.log('>>> Se ha recibido un archivo, este se ha guardado en:', filepath)
+
+              }else{
+                
+                received = Func.received_one_one(username,from,id),
+                xmpp.send(received);
+                sleep(1000);
+                console.log(`\n NOTIFICATION  >>> Message from: ${from} \n\t\t content: ${body}`);
+  
+                const messageObject = {
+                  person: from,
+                  body: body,
+                  id: id
+                };
+                PM.push(messageObject);
+              }
+
             }
 
             if (receivedElement) {
@@ -189,11 +202,12 @@ rl.question("Ingresa tu usuario: ", (username) => {
           }
       } else if (stanza.is('presence') && stanza.getChild('show')){
             const from = stanza.attrs.from;
+            const status = stanza.getChild('status')
             const me = `${username}@alumchat.xyz`
           if (from !== username){
             const parts = from.split('@');
             const part_Ineed =parts[0]
-            console.log(`\n NOTIFICATION >>> ${part_Ineed} has changed status`);
+            console.log(`\n NOTIFICATION >>> ${part_Ineed} has changed status to ${status}`);
           }
     }else if (stanza.is('iq')  && stanza.getChild('query', 'jabber:iq:roster') && stanza.attrs.type === "result" ){
         
@@ -255,7 +269,16 @@ rl.question("Ingresa tu usuario: ", (username) => {
         };
         GM.push(messageObject);
       } 
+    }else if (stanza.is('presence') && stanza.attrs.type === 'online'){
+      const from = stanza.attrs.from;
+      const parts = from.split('@');
+      const part_Ineed =parts[0]
+
+      if (part_Ineed !== username){
+        console.log(`\n NOTIFICATION >>> ${part_Ineed} has gone online`);
+      }
     }
+
     });
 
       xmpp.on('online', async (address) => {
