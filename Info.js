@@ -367,12 +367,18 @@ function eliminate_friends(){
 }
 }
 
-function new_group(){
-  rl.question("Ingresa nombre para el grupo: ", (room) => {
-    roomN = room;
+function new_group(room){
     st = Func.create_group(room,using_user);
     xmppInstance.send(st);
-    Group_menu();
+
+}
+function having_group(){
+  rl.question("Ingresa nombre para el grupo: ", (room) => {
+    new_group(room);
+    st2 = Func.autojoin(room,using_user);
+    xmppInstance.send(st2);
+
+  Group_menu();
 });
 }
 
@@ -558,7 +564,7 @@ function Choice_group(choice){
   switch (choice) {
     case '1':
         console.log("\nSeleccionaste Crear grupo");
-        new_group();
+        having_group();
         break;
     case '2':
         console.log("\nSeleccionaste Ver mensajes");

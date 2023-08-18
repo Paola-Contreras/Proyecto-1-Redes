@@ -151,24 +151,24 @@ function received_one_one(user, person,ID){
 function create_group(room, user){ 
     const Stanza = xml(
       "presence",
-      { to: `${room}@conference.alumchat.xyz/${user}`, from: `${room}@conference.alumchat.xyz/${user}`}
-    );
-  
-    const xElement = xml(
-      "x",
-      {xmlns: "http://jabber.org/protocol/muc#user"}
-    );
-  
-    const itemElement = xml(
-      "item",
-      {jid: `${user}`, affiliation: "owner", role: "moderator"}
-    );
-  
-    xElement.append(itemElement);
-    Stanza.append(xElement);
-    
+      { to: `${room}@conference.alumchat.xyz/${user}@alumchat.xyz`, from: `${room}@conference.alumchat.xyz/${user}@alumchat.xyz`},
+       xml("x", {xmlns: "http://jabber.org/protocol/muc#user"},
+       xml("item",{jid: `${user}@alumchat.xyz`, affiliation: "owner", role: "moderator"}
+    )));
+
     console.log(Stanza.toString())
     return Stanza;
+}
+
+function autojoin(room,user){
+    const Stanza = xml(
+        "presence",
+        { to: `${room}@conference.alumchat.xyz/${user}@alumchat.xyz`, from: `${user}@alumchat.xyz`},
+         xml("x", {xmlns: "http://jabber.org/protocol/muc"},
+      ));
+  
+      console.log(Stanza.toString())
+      return Stanza;
 }
 
 function invite_group( room, person){
@@ -258,6 +258,7 @@ module.exports = {
     rooster,
     presence,
     register,
+    autojoin,
     joinRoom,
     subscribe,
     my_presence,
