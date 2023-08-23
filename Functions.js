@@ -156,7 +156,6 @@ function create_group(room, user){
        xml("item",{jid: `${user}@alumchat.xyz`, affiliation: "owner", role: "moderator"}
     )));
 
-    console.log(Stanza.toString())
     return Stanza;
 }
 
@@ -166,8 +165,6 @@ function autojoin(room,user){
         { to: `${room}@conference.alumchat.xyz/${user}@alumchat.xyz`, from: `${user}@alumchat.xyz`},
          xml("x", {xmlns: "http://jabber.org/protocol/muc"},
       ));
-  
-      console.log(Stanza.toString())
       return Stanza;
 }
 
@@ -178,7 +175,6 @@ function invite_group( room, person){
         xml("query", { xmlns: "http://jabber.org/protocol/muc#admin" },
         xml("item", { jid: `${person}@alumchat.xyz`, affiliation: "member" })
     ));
-    console.log(stanza.toString())
     return stanza;  
 }
 

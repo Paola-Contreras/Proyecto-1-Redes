@@ -57,8 +57,7 @@ function Pres_menu(){
     console.log("1. Busy")
     console.log("2. No Available")
     console.log("3. Away")
-    console.log("4. Offline")
-    console.log("5. Online")
+    console.log("4. Online")
 
     rl.question("Ingresa tu elección: ", function(choice) {
         Choice_presence(choice);
@@ -110,10 +109,10 @@ async function processRegistration() {
 }
 
 function delete_user() {
-      rl.question("Ingresa contraseña: ", (password) => {
+      rl.question("Ingresa contraseña: ", async (password) => {
         eliminate_friends();
         st2 = Func. delete_account(using_user, password);
-        xmppInstance.send(st2);
+        await xmppInstance.send(st2);
         sleep(2000);
         xmppInstance.stop();
         mainMenu();
@@ -202,11 +201,11 @@ rl.question("Ingresa tu usuario: ", (username) => {
           }
       } else if (stanza.is('presence') && stanza.getChild('show')){
             const from = stanza.attrs.from;
-            const status = stanza.getChild('status')
-            const me = `${username}@alumchat.xyz`
-          if (from !== username){
+            const status = stanza.getChild('status')          
             const parts = from.split('@');
             const part_Ineed =parts[0]
+            const me = `${username}@alumchat.xyz`
+          if (part_Ineed !== username){
             console.log(`\n NOTIFICATION >>> ${part_Ineed} has changed status to ${status}`);
           }
     }else if (stanza.is('iq')  && stanza.getChild('query', 'jabber:iq:roster') && stanza.attrs.type === "result" ){
@@ -219,13 +218,14 @@ rl.question("Ingresa tu usuario: ", (username) => {
             subscription: item.attrs.subscription,
         }));
 
+
         rosterInfo = items.map(item => {
           const jid = item.attrs.jid;
           const label = item.attrs.name || '';
           const subscription = item.attrs.subscription;
           const presence = item.getChild('presence', 'jabber:client');
           const presenceType = presence ? presence.attrs.type : 'unavailable';
-          
+
           return {
             jid,
             label,
@@ -302,9 +302,9 @@ rl.question("Ingresa tu usuario: ", (username) => {
 });
 }
 
-function closeConnection() {
+async function closeConnection() {
     if (xmppInstance) {
-      xmppInstance.stop();
+      await xmppInstance.stop();
       console.log("Disconnected from XMPP server.\n");
     } else {
       console.log("No XMPP connection to close.");
@@ -372,6 +372,7 @@ function new_group(room){
     xmppInstance.send(st);
 
 }
+
 function having_group(){
   rl.question("Ingresa nombre para el grupo: ", (room) => {
     new_group(room);
